@@ -40,7 +40,7 @@ class Portfolio:
         ax1.plot(TrackValue_df.index, TrackValue_df.log_value, c='green', label='Algorithm')
 
         if Market is not None:
-            Market['pChange'] = Market['close'] / Market['close'].shift(1)
+            Market = Market.loc[:self.now]
             Market['Rolling_pChange'] = Market['pChange'].rolling(len(Market.index), min_periods=1).apply(np.prod)
             Market['Balance'] = self.InitialCash * Market['Rolling_pChange']
             Market['log_balance'] = np.log(Market['Balance'])

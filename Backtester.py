@@ -1,5 +1,4 @@
 import argparse
-
 from termcolor import colored
 import tdaClientInterpreter as tda
 from datetime import datetime, timedelta
