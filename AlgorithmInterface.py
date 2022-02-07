@@ -21,9 +21,7 @@ class Algorithm:
         self.now = None
 
     def OnData(self):
-        spy = self.Slice.loc["SPY"].iloc[-1].close
-        if not self.Portfolio.InTrade:
-            self.PlaceLimitOrder("SPY", 1, spy)
+        pass
 
     def OnFinish(self, market):
         pass
