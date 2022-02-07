@@ -39,7 +39,7 @@ class Backtester:
                                                         parse_dates=['datetime'])
             except FileNotFoundError:
                 logger.warning(colored(f"{ticker} not found in Resources/Data! "
-                               f"Try rerunning with update parameter enabled (-u)", "red"))
+                                       f"Try rerunning with update parameter enabled (-u)", "red"))
                 self.Tickers.remove(ticker)
 
         self.PreProcess()
@@ -88,7 +88,25 @@ class Backtester:
         logger.debug(f"Updating CSV files...")
         for ticker in tqdm(self.Settings.Tickers):
             try:
-                price_history = tda.get_price_history_day(ticker, self.Settings.StartDate, self.Settings.EndDate)
+                if self.Settings.Frequency == Frequency.Minute:
+                    price_history = tda.get_price_history_minute(ticker, self.Settings.StartDate,
+                                                                 self.Settings.EndDate)
+                elif self.Settings.Frequency == Frequency.Five_Minute:
+                    price_history = tda.get_price_history_five_minute(ticker, self.Settings.StartDate,
+                                                                      self.Settings.EndDate)
+                elif self.Settings.Frequency == Frequency.Fifteen_Minute:
+                    price_history = tda.get_price_history_fifteen_minute(ticker, self.Settings.StartDate,
+                                                                         self.Settings.EndDate)
+                elif self.Settings.Frequency == Frequency.Thirty_Minute:
+                    price_history = tda.get_price_history_thirty_minute(ticker, self.Settings.StartDate,
+                                                                        self.Settings.EndDate)
+                elif self.Settings.Frequency == Frequency.Day:
+                    price_history = tda.get_price_history_day(ticker, self.Settings.StartDate,
+                                                              self.Settings.EndDate)
+                else:
+                    price_history = tda.get_price_history_week(ticker, self.Settings.StartDate,
+                                                               self.Settings.EndDate)
+
                 # Timezone adjustment - needs fixing
                 price_history['datetime'] = price_history['datetime'] - (4 * 60 * 60 * 1000)
                 price_history['datetime'] = pd.to_datetime(price_history['datetime'], unit='ms')
@@ -119,6 +137,7 @@ if __name__ == '__main__':
 
     algo = Algorithm()
     algo.AddEquity("SPY")
+    algo.SetFrequency(Frequency.Week)
     backtest = Backtester(algo.Settings, args.Update)
 
     try:

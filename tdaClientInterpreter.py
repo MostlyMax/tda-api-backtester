@@ -131,6 +131,12 @@ def get_price_history_day(symbol, start_datetime=None, end_datetime=None):
                                                            end_datetime=end_datetime).json()['candles'])
 
 
+def get_price_history_week(symbol, start_datetime=None, end_datetime=None):
+    return pd.DataFrame(client.get_price_history_every_week(symbol,
+                                                            start_datetime=start_datetime,
+                                                            end_datetime=end_datetime).json()['candles'])
+
+
 async def async_get_price_history_day(symbol, start_datetime=None, end_datetime=None):
     return pd.DataFrame(client.get_price_history_every_day(symbol,
                                                            start_datetime=start_datetime,
