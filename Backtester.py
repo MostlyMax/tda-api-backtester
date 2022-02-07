@@ -75,7 +75,9 @@ class Backtester:
             algo.now = idx
             algo.Portfolio.now = idx
 
+            algo.UpdateOrders()
             algo.OnData()
+            algo.UpdateOrders()
             algo.Portfolio.UpdateValue()
 
     def ExportData(self):
@@ -84,8 +86,6 @@ class Backtester:
             os.mkdir('Resources/Data')
 
         logger.debug(f"Updating CSV files...")
-        if 'SPY' not in self.Settings.Tickers: self.Settings.Tickers.append('SPY')
-
         for ticker in tqdm(self.Settings.Tickers):
             try:
                 price_history = tda.get_price_history_day(ticker, self.Settings.StartDate, self.Settings.EndDate)
@@ -101,6 +101,7 @@ class Backtester:
 
 
 def main(algo: Algorithm, update: bool):
+    algo.AddEquity('SPY')
     backtest = Backtester(algo.Settings, update)
 
     try:
@@ -117,6 +118,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     algo = Algorithm()
+    algo.AddEquity("SPY")
     backtest = Backtester(algo.Settings, args.Update)
 
     try:

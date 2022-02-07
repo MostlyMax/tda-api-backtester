@@ -1,21 +1,44 @@
 import pandas as pd
+from Environment import *
 
 
 class Portfolio:
     def __init__(self):
         self.Value = 100_000
         self.Cash = 100_000
-        self.Holdings = pd.DataFrame(columns=['Quantity', 'AvgPrice', 'Value'])
+        self.Holdings = pd.DataFrame(columns=['Quantity', 'AvgPrice', 'Cost', 'RecentPrice'])
         self.TrackValue = {}
+        self.InTrade = False
 
         self.Slice = None
         self.now = None
 
+    # TODO Broken Class!!
     def UpdateValue(self):
-        self.Holdings['Value'] = self.Holdings['Quantity'] * self.Holdings['AvgPrice']
+        self.Holdings['Cost'] = self.Holdings['Quantity'] * self.Holdings['AvgPrice']
 
-        Portfolio_Value = self.Holdings['Value'].sum()
-        self.Value = self.Cash + Portfolio_Value
+        Portfolio_Cost = self.Holdings['Cost'].sum()
+        self.Value = self.Cash + Portfolio_Cost
+
+        self.TrackValue[self.now] = self.Value
+
+        if Portfolio_Cost != 0: self.InTrade = True
+
+    def PlotValue(self, Market=None):
+        pass
+
+    def FillOrder(self, order: Order):
+        self.Cash += (order.Quantity * order.Price)
+
+        ticker_holding = self.Holdings.loc[order.Ticker]
+        new_total_price = ticker_holding['Quantity'] * ticker_holding['AvgPrice'] + order.Quantity * order.Price
+        new_total_quantity = ticker_holding['Quantity'] + order.Quantity
+
+        if new_total_quantity == 0: self.Holdings.loc[order.Ticker] = [0, 0, 0]
+
+        else:
+            new_average_price = new_total_price / new_total_quantity
+            self.Holdings.loc[order.Ticker] = [new_total_quantity, new_average_price, 0]
 
     def AddEquities(self, tickers):
         zeros = [0] * len(tickers)

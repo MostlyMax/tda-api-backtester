@@ -16,16 +16,19 @@ class Algorithm:
 
         self.Portfolio = Portfolio()
         self.Settings = Environment()
+        self.Orders = {}
         self.Slice = None
         self.now = None
 
     def OnData(self):
-        pass
+        spy = self.Slice.loc["SPY"].iloc[-1].close
+        if not self.Portfolio.InTrade:
+            self.PlaceLimitOrder("SPY", 1, spy)
 
     def OnFinish(self, market):
         pass
 
-    # Changing Environment Settings
+    # --- Environment Settings --- #
     def SetFrequency(self, freq: Frequency):
         self.Settings.Frequency = freq
 
@@ -56,5 +59,41 @@ class Algorithm:
     def SetStartingCash(self, amount):
         self.Portfolio.Value = amount
         self.Portfolio.Cash = amount
+
+    # --- Order Placement --- #
+
+    def PlaceMarketOrder(self, ticker, quantity):
+        price = self.Slice.loc[ticker, 'close'].iloc[-1]
+        if price * quantity > self.Portfolio.Cash: return False
+
+        order = Order(ticker, quantity, self.Slice.loc[ticker, 'close'].iloc[-1])
+        self.Portfolio.FillOrder(order)
+
+    def PlaceLimitOrder(self, ticker, quantity, price):
+        if price * quantity > self.Portfolio.Cash: return False
+
+        order = Order(ticker, quantity, price)
+
+        orderno = len(self.Orders)
+        self.Orders[orderno] = order
+
+        return orderno
+
+    def UpdateOrders(self):
+        delete_keys = []
+
+        for key, order in self.Orders.items():
+            ticker_data = self.Slice.loc[order.Ticker].iloc[-1]
+
+            if order.Quantity > 0 and order.Price > ticker_data.low:
+                self.Portfolio.FillOrder(order)
+                delete_keys.append(key)
+
+            if order.Quantity < 0 and order.Price < ticker_data.high:
+                self.Portfolio.FillOrder(order)
+                delete_keys.append(key)
+
+        for key in delete_keys: del self.Orders[key]
+
 
 
