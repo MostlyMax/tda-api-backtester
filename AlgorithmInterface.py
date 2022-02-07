@@ -57,6 +57,7 @@ class Algorithm:
     def SetStartingCash(self, amount):
         self.Portfolio.Value = amount
         self.Portfolio.Cash = amount
+        self.Portfolio.InitialCash = amount
 
     # --- Order Placement --- #
 
