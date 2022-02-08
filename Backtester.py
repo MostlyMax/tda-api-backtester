@@ -11,7 +11,7 @@ from tqdm import tqdm
 import logging
 import os
 from Environment import *
-from AlgorithmInterface import Algorithm
+from AlgorithmInterface import *
 
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger('Backtester.py')
@@ -117,7 +117,7 @@ class Backtester:
                 logger.warning(f"{ticker} KeyError")
 
 
-def main(algo: Algorithm, update: bool):
+def InitializeBacktest(algo: Algorithm, update: bool):
     algo.AddEquity('SPY')
     backtest = Backtester(algo.Settings, update)
 

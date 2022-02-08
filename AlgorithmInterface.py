@@ -5,7 +5,7 @@ import math
 import numpy as np
 from Environment import *
 from Portfolio import *
-import logging
+import logging, argparse
 
 
 logger = logging.getLogger('Backtester.py')
